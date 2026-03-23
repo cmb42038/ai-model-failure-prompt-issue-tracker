@@ -20,6 +20,26 @@
     "tags": ["instruction-following", "summarization"]
   },
   {
+    "title": "JSON summary request returned bullet points",
+    "model_name": "gpt-4.1",
+    "prompt_text": "Return a JSON object with a summary field only.",
+    "expected_behavior": "Return valid JSON with one summary field.",
+    "actual_behavior": "Returned bullet points instead of JSON output.",
+    "issue_type": "formatting",
+    "summary": "gpt-4.1 issue (formatting): JSON summary request returned bullet points",
+    "tags": ["formatting", "json"]
+  },
+  {
+    "title": "Style instruction was ignored in final answer",
+    "model_name": "gpt-4.1-mini",
+    "prompt_text": "Answer in one short sentence and keep the tone neutral.",
+    "expected_behavior": "Follow the style instruction and return one short sentence.",
+    "actual_behavior": "Returned a long answer and ignored the style instruction.",
+    "issue_type": "instruction-following",
+    "summary": "gpt-4.1-mini issue (instruction following): Style instruction was ignored in final answer",
+    "tags": ["instruction-following", "style"]
+  },
+  {
     "title": "Product details were hallucinated in the answer",
     "model_name": "gpt-4.1-mini",
     "prompt_text": "Answer only from the provided product catalog.",

@@ -29,3 +29,17 @@ class SimilarIncidentMatch(BaseModel):
 class SimilarIncidentsResponse(BaseModel):
     query_incident: NormalizedIncident
     matches: list[SimilarIncidentMatch] = Field(default_factory=list)
+
+
+class IncidentCluster(BaseModel):
+    cluster_id: int
+    label: str
+    incident_count: int
+    incidents: list[NormalizedIncident] = Field(default_factory=list)
+
+
+class IncidentClustersResponse(BaseModel):
+    method: str
+    total_incidents: int
+    total_clusters: int
+    clusters: list[IncidentCluster] = Field(default_factory=list)

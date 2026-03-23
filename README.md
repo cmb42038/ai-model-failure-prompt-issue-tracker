@@ -8,6 +8,7 @@ The project currently includes a small FastAPI application, a Pydantic bug repor
 
 ```text
 app/
+  clustering.py
   __init__.py
   main.py
   normalization.py
@@ -17,6 +18,7 @@ app/
     sample_incidents.json
 tests/
   test_bug_reports.py
+  test_clustering.py
   test_main.py
   test_normalization.py
   test_retrieval.py
@@ -100,6 +102,19 @@ The retrieval layer uses a simple TF-IDF plus cosine similarity approach written
 
 This keeps the retrieval code modular and makes it easier to swap in embeddings later.
 
+## Group Failure Patterns
+
+Use `GET /incidents/clusters` to group the current incident corpus into rough failure-pattern clusters.
+
+This is a baseline implementation. It:
+
+- uses the normalized incident text
+- builds simple TF-IDF vectors
+- links incidents when their cosine similarity passes a small threshold
+- returns connected groups as rough clusters
+
+It is intentionally simple and designed to be replaced later by better clustering methods or embeddings.
+
 ## Run Tests
 
 ```powershell
@@ -116,6 +131,7 @@ Right now the project includes:
 - a normalized incident layer
 - a simple normalization service
 - a baseline similar-incident retrieval layer
+- a baseline failure-pattern clustering layer
 - basic pytest tests
 - a simple project structure
 - setup instructions for local development

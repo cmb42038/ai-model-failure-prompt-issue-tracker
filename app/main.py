@@ -2,10 +2,12 @@ from typing import Any
 
 from fastapi import FastAPI
 
+from app.clustering import cluster_incidents
 from app.normalization import normalize_bug_report
 from app.retrieval import build_search_corpus, find_similar_incidents
 from app.schemas import (
     BugReport,
+    IncidentClustersResponse,
     NormalizedIncident,
     SimilarIncidentsResponse,
 )
@@ -54,4 +56,17 @@ def find_similar_incidents_endpoint(
     return SimilarIncidentsResponse(
         query_incident=query_incident,
         matches=matches,
+    )
+
+
+@app.get("/incidents/clusters", response_model=IncidentClustersResponse)
+def cluster_incidents_endpoint() -> IncidentClustersResponse:
+    incidents = build_search_corpus(bug_reports)
+    clusters = cluster_incidents(incidents)
+
+    return IncidentClustersResponse(
+        method="baseline-tfidf-threshold-clustering",
+        total_incidents=len(incidents),
+        total_clusters=len(clusters),
+        clusters=clusters,
     )
