@@ -19,3 +19,13 @@ class NormalizedIncident(BaseModel):
     issue_type: str
     summary: str
     tags: list[str] = Field(default_factory=list)
+
+
+class SimilarIncidentMatch(BaseModel):
+    score: float
+    incident: NormalizedIncident
+
+
+class SimilarIncidentsResponse(BaseModel):
+    query_incident: NormalizedIncident
+    matches: list[SimilarIncidentMatch] = Field(default_factory=list)

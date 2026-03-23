@@ -3,7 +3,12 @@ from typing import Any
 from fastapi import FastAPI
 
 from app.normalization import normalize_bug_report
-from app.schemas import BugReport, NormalizedIncident
+from app.retrieval import build_search_corpus, find_similar_incidents
+from app.schemas import (
+    BugReport,
+    NormalizedIncident,
+    SimilarIncidentsResponse,
+)
 
 app = FastAPI(title="AI Model Failure / Prompt Issue Tracker")
 bug_reports: list[BugReport] = []
@@ -36,3 +41,17 @@ def create_bug_report(bug_report: BugReport) -> dict[str, Any]:
 @app.post("/bug-reports/normalize", response_model=NormalizedIncident)
 def normalize_bug_report_endpoint(bug_report: BugReport) -> NormalizedIncident:
     return normalize_bug_report(bug_report)
+
+
+@app.post("/incidents/similar", response_model=SimilarIncidentsResponse)
+def find_similar_incidents_endpoint(
+    bug_report: BugReport,
+) -> SimilarIncidentsResponse:
+    query_incident = normalize_bug_report(bug_report)
+    incidents = build_search_corpus(bug_reports)
+    matches = find_similar_incidents(query_incident, incidents)
+
+    return SimilarIncidentsResponse(
+        query_incident=query_incident,
+        matches=matches,
+    )

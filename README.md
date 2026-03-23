@@ -11,11 +11,15 @@ app/
   __init__.py
   main.py
   normalization.py
+  retrieval.py
   schemas.py
+  data/
+    sample_incidents.json
 tests/
   test_bug_reports.py
   test_main.py
   test_normalization.py
+  test_retrieval.py
 requirements.txt
 README.md
 ```
@@ -85,6 +89,17 @@ The normalization logic is intentionally simple for now. It uses straightforward
 
 This keeps the code easy to understand before adding any real LLM-based processing later.
 
+## Find Similar Incidents
+
+Send a bug report to `POST /incidents/similar` to get the top similar normalized incidents.
+
+The retrieval layer uses a simple TF-IDF plus cosine similarity approach written in plain Python so the logic is easy to read. It compares the normalized query against:
+
+- a small sample incident dataset
+- any bug reports stored during the current app session
+
+This keeps the retrieval code modular and makes it easier to swap in embeddings later.
+
 ## Run Tests
 
 ```powershell
@@ -100,6 +115,7 @@ Right now the project includes:
 - a POST endpoint for bug reports
 - a normalized incident layer
 - a simple normalization service
+- a baseline similar-incident retrieval layer
 - basic pytest tests
 - a simple project structure
 - setup instructions for local development
