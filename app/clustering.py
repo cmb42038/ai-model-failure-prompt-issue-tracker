@@ -1,3 +1,5 @@
+"""Baseline helpers for grouping similar incidents into rough clusters."""
+
 from collections import Counter
 
 from app.retrieval import build_tfidf_vectors, cosine_similarity, incident_to_text
@@ -15,6 +17,7 @@ def cluster_incidents(
     incidents: list[NormalizedIncident],
     similarity_threshold: float = 0.25,
 ) -> list[IncidentCluster]:
+    """Cluster incidents by connecting pairs above a similarity threshold."""
     if not incidents:
         return []
 

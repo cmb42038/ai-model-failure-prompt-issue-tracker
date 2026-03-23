@@ -1,8 +1,42 @@
-# AI Model Failure - Prompt Issue Tracker
+# AI Model Failure / Prompt Issue Tracker
 
-A beginner-friendly Python project for collecting and organizing messy AI bug reports.
+A beginner-friendly Python project for collecting messy AI bug reports, turning them into cleaner incident records, and evaluating a few simple baseline workflows around them.
 
-The project currently includes a small FastAPI application, a Pydantic bug report schema, and basic tests. It is designed to stay simple while building a foundation for future work like normalization, clustering, and similarity search.
+The project is intentionally small and practical. It is meant to be understandable, easy to extend, and useful as a foundation for future work such as better retrieval, richer normalization, or embeddings-based analysis.
+
+## What This Project Does
+
+This repository provides a small FastAPI backend that can:
+
+- accept raw AI bug reports
+- normalize those reports into a cleaner incident format
+- retrieve similar incidents with a TF-IDF plus cosine similarity baseline
+- group incidents into rough failure-pattern clusters
+- draft reproduction cases with a local fallback and an optional LLM path
+- run a small benchmark over the current baseline behavior
+
+## Why It Matters
+
+AI bug reports are often inconsistent. Different people describe the same issue in different ways, and that makes it harder to compare failures, find repeats, prioritize work, or build better datasets later.
+
+This project focuses on the early steps of that workflow:
+
+- capture the report
+- normalize the information
+- compare it with related incidents
+- group rough patterns
+- produce a draft repro case
+- evaluate the current baseline
+
+## Current Features
+
+- `POST /bug-reports` stores raw bug reports in memory
+- `POST /bug-reports/normalize` converts a raw report into a normalized incident
+- `POST /incidents/similar` returns top similar incidents from a small sample corpus plus current in-memory reports
+- `GET /incidents/clusters` returns rough failure-pattern groupings
+- `POST /bug-reports/repro-draft` creates a repro-case draft from a raw bug report
+- `POST /incidents/repro-draft` creates a repro-case draft from a normalized incident
+- `python -m app.evaluation` runs the small baseline benchmark
 
 ## Project Structure
 
@@ -32,7 +66,7 @@ requirements.txt
 README.md
 ```
 
-## Setup
+## Installation
 
 1. Create a virtual environment:
 
@@ -40,161 +74,99 @@ README.md
 python -m venv .venv
 ```
 
-2. Activate the virtual environment:
+2. Activate it:
 
 ```powershell
 .venv\Scripts\Activate.ps1
 ```
 
-3. Install the dependencies:
+3. Install dependencies:
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-4. Optional: enable LLM-based repro drafting:
+4. Optional: copy the environment example if you want to try the repro-drafting API path:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Then update the values in `.env` if you want to turn on real API calls.
+If you do that, update the values in `.env` before enabling real API calls.
 
-## Run The App
+## Run The API
 
-Start the FastAPI development server:
+Start the development server:
 
 ```powershell
 uvicorn app.main:app --reload
 ```
 
-Then open:
+Useful URLs:
 
 - `http://127.0.0.1:8000/`
 - `http://127.0.0.1:8000/docs`
 
-## Submit A Bug Report
+## Example API Usage
 
-Use the FastAPI docs page at `http://127.0.0.1:8000/docs` or send a `POST` request to `/bug-reports`.
-
-Example JSON body:
-
-```json
-{
-  "title": "Model ignored system instruction",
-  "model_name": "gpt-4.1-mini",
-  "prompt": "Summarize this support ticket in one sentence.",
-  "expected_behavior": "Return a one-sentence summary.",
-  "actual_behavior": "Returned a long bulleted list instead.",
-  "tags": ["formatting", "instruction-following"]
-}
-```
-
-For now, bug reports are stored only in memory. That means they are cleared whenever the app restarts.
-
-## Normalize A Bug Report
-
-Send the same bug report JSON to `POST /bug-reports/normalize` to get a cleaner incident format back.
-
-The normalization logic is intentionally simple for now. It uses straightforward rules such as:
-
-- trimming extra whitespace
-- lowercasing and cleaning tags
-- assigning a basic issue type from keywords
-- building a short summary
-
-This keeps the code easy to understand before adding any real LLM-based processing later.
-
-## Find Similar Incidents
-
-Send a bug report to `POST /incidents/similar` to get the top similar normalized incidents.
-
-The retrieval layer uses a simple TF-IDF plus cosine similarity approach written in plain Python so the logic is easy to read. It compares the normalized query against:
-
-- a small sample incident dataset
-- any bug reports stored during the current app session
-
-This keeps the retrieval code modular and makes it easier to swap in embeddings later.
-
-## Group Failure Patterns
-
-Use `GET /incidents/clusters` to group the current incident corpus into rough failure-pattern clusters.
-
-This is a baseline implementation. It:
-
-- uses the normalized incident text
-- builds simple TF-IDF vectors
-- links incidents when their cosine similarity passes a small threshold
-- returns connected groups as rough clusters
-
-It is intentionally simple and designed to be replaced later by better clustering methods or embeddings.
-
-## Draft A Repro Case
-
-You can generate a repro-case draft from either:
-
-- `POST /bug-reports/repro-draft`
-- `POST /incidents/repro-draft`
-
-Each draft includes:
-
-- a short summary
-- the likely failure type
-- reproduction steps
-- expected behavior
-- actual behavior
-- a simple pass/fail test case draft
-
-The repro service is split into three small parts:
-
-- prompt construction
-- API calling
-- response parsing
-
-If LLM use is disabled or not configured, the app falls back to a local rule-based draft so the feature still works without network access.
-
-### Optional LLM Configuration
-
-This milestone includes an optional OpenAI-compatible chat completion integration for repro drafting.
-
-Environment variables:
-
-- `REPRO_USE_LLM`
-- `REPRO_LLM_API_KEY`
-- `REPRO_LLM_MODEL`
-- `REPRO_LLM_BASE_URL`
-- `REPRO_LLM_TIMEOUT_SECONDS`
-
-If `REPRO_USE_LLM` is not set to `true`, the app uses the local fallback draft builder instead.
-
-### Testing Note
-
-The automated tests cover the local fallback logic, prompt building, response parsing, configuration loading, and endpoint behavior without network calls.
-
-The live API path was not exercised in automated tests for this milestone.
-
-## Run The Evaluation
-
-Run the small benchmark with:
+The easiest way to explore the API is through the FastAPI docs page at `/docs`. If you want to send requests directly from PowerShell, this is a simple example payload:
 
 ```powershell
-python -m app.evaluation
+$body = @{
+  title = "Model ignored system instruction"
+  model_name = "gpt-4.1-mini"
+  prompt = "Summarize this support ticket in one sentence."
+  expected_behavior = "Return a one-sentence summary."
+  actual_behavior = "Returned a long bulleted list instead."
+  tags = @("formatting", "instruction-following")
+} | ConvertTo-Json
 ```
 
-The evaluation uses the labeled sample dataset in `app/data/evaluation_cases.json` and reports simple baseline checks for:
+Store a raw bug report:
 
-- normalization structure and expected labels
-- top-1 similar-incident retrieval
-- clustering pairwise group agreement
-- repro-case draft completeness
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://127.0.0.1:8000/bug-reports" `
+  -ContentType "application/json" `
+  -Body $body
+```
 
-### Evaluation Limitations
+Normalize the same report:
 
-- the benchmark is intentionally small and hand-written
-- the metrics are simple counts and rule-based checks
-- clustering is checked with pairwise agreement, not advanced clustering scores
-- repro drafting checks required sections and shape, not writing quality
-- the live LLM API path is not scored by this baseline benchmark
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://127.0.0.1:8000/bug-reports/normalize" `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+Find similar incidents:
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://127.0.0.1:8000/incidents/similar" `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+Get rough incident clusters:
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:8000/incidents/clusters"
+```
+
+Draft a repro case:
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://127.0.0.1:8000/bug-reports/repro-draft" `
+  -ContentType "application/json" `
+  -Body $body
+```
 
 ## Run Tests
 
@@ -202,19 +174,36 @@ The evaluation uses the labeled sample dataset in `app/data/evaluation_cases.jso
 pytest
 ```
 
-## Current Milestone
+## Run The Evaluation / Benchmark
 
-Right now the project includes:
+Run the baseline benchmark with:
 
-- a minimal FastAPI app
-- a Pydantic bug report schema
-- a POST endpoint for bug reports
-- a normalized incident layer
-- a simple normalization service
-- a baseline similar-incident retrieval layer
-- a baseline failure-pattern clustering layer
-- an optional LLM-powered repro-case drafting layer
-- a small baseline evaluation framework and benchmark dataset
-- basic pytest tests
-- a simple project structure
-- setup instructions for local development
+```powershell
+python -m app.evaluation
+```
+
+The benchmark uses the labeled sample dataset in `app/data/evaluation_cases.json` and reports simple checks for:
+
+- normalization structure and expected labels
+- top-1 similar-incident retrieval
+- clustering pairwise group agreement
+- repro-case draft completeness
+
+## Current Limitations
+
+- raw bug report storage is in memory only, so data is lost when the app restarts
+- normalization is rule-based and intentionally simple
+- retrieval and clustering use small TF-IDF baselines, not embeddings
+- the sample datasets are small and hand-written
+- repro drafting falls back to a local rule-based generator unless LLM use is explicitly enabled
+- the live API path for repro drafting was not exercised in automated tests
+- evaluation metrics are basic and designed for clarity, not exhaustive measurement
+
+## Future Improvements
+
+- persistent storage for reports and normalized incidents
+- richer incident schemas and stronger normalization rules
+- embeddings-based retrieval and clustering
+- better benchmark coverage and larger labeled datasets
+- more robust evaluation for generated repro drafts
+- optional UI or reporting layer once the backend foundations are stable

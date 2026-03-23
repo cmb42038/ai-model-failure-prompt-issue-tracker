@@ -1,7 +1,10 @@
+"""Simple rule-based helpers for turning raw bug reports into incidents."""
+
 from app.schemas import BugReport, NormalizedIncident
 
 
 def normalize_text(value: str) -> str:
+    """Trim whitespace and collapse repeated spaces."""
     return " ".join(value.strip().split())
 
 
@@ -18,6 +21,7 @@ def normalize_tags(tags: list[str]) -> list[str]:
 
 
 def detect_issue_type(bug_report: BugReport, normalized_tags: list[str]) -> str:
+    """Assign a simple issue type from keywords in the report and tags."""
     searchable_text = " ".join(
         [
             bug_report.title,
@@ -46,6 +50,7 @@ def build_summary(title: str, model_name: str, issue_type: str) -> str:
 
 
 def normalize_bug_report(bug_report: BugReport) -> NormalizedIncident:
+    """Convert a raw bug report into a normalized incident record."""
     normalized_title = normalize_text(bug_report.title)
     normalized_model_name = normalize_text(bug_report.model_name)
     normalized_prompt = normalize_text(bug_report.prompt)

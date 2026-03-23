@@ -1,3 +1,5 @@
+"""FastAPI application exposing the project's public API endpoints."""
+
 from typing import Any
 
 from fastapi import FastAPI
@@ -36,6 +38,7 @@ def health_check() -> dict[str, str]:
 
 @app.post("/bug-reports")
 def create_bug_report(bug_report: BugReport) -> dict[str, Any]:
+    """Store a raw bug report in the in-memory list."""
     bug_reports.append(bug_report)
 
     return {
@@ -47,11 +50,13 @@ def create_bug_report(bug_report: BugReport) -> dict[str, Any]:
 
 @app.post("/bug-reports/normalize", response_model=NormalizedIncident)
 def normalize_bug_report_endpoint(bug_report: BugReport) -> NormalizedIncident:
+    """Return a normalized incident for a raw bug report."""
     return normalize_bug_report(bug_report)
 
 
 @app.post("/bug-reports/repro-draft", response_model=ReproCaseDraft)
 def create_repro_draft_from_bug_report(bug_report: BugReport) -> ReproCaseDraft:
+    """Draft a repro case from a raw bug report."""
     return generate_repro_case_draft_from_bug_report(bug_report)
 
 
@@ -59,6 +64,7 @@ def create_repro_draft_from_bug_report(bug_report: BugReport) -> ReproCaseDraft:
 def find_similar_incidents_endpoint(
     bug_report: BugReport,
 ) -> SimilarIncidentsResponse:
+    """Return the top similar incidents for a raw bug report."""
     query_incident = normalize_bug_report(bug_report)
     incidents = build_search_corpus(bug_reports)
     matches = find_similar_incidents(query_incident, incidents)
@@ -73,11 +79,13 @@ def find_similar_incidents_endpoint(
 def create_repro_draft_from_incident(
     incident: NormalizedIncident,
 ) -> ReproCaseDraft:
+    """Draft a repro case from a normalized incident."""
     return generate_repro_case_draft_from_incident(incident)
 
 
 @app.get("/incidents/clusters", response_model=IncidentClustersResponse)
 def cluster_incidents_endpoint() -> IncidentClustersResponse:
+    """Return rough failure-pattern clusters for the current incident corpus."""
     incidents = build_search_corpus(bug_reports)
     clusters = cluster_incidents(incidents)
 

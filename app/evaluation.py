@@ -1,3 +1,5 @@
+"""Small baseline benchmark helpers for the current project features."""
+
 import json
 from pathlib import Path
 from typing import Any
@@ -23,6 +25,7 @@ class EvaluationCase(BaseModel):
 
 
 def load_evaluation_cases() -> list[EvaluationCase]:
+    """Load the labeled benchmark cases used by the evaluation module."""
     with EVALUATION_CASES_PATH.open(encoding="utf-8") as file:
         raw_cases = json.load(file)
 
@@ -243,6 +246,7 @@ def evaluate_repro_drafting(cases: list[EvaluationCase]) -> dict[str, Any]:
 
 
 def run_evaluation() -> dict[str, Any]:
+    """Run the small baseline benchmark and return a JSON-friendly report."""
     cases = load_evaluation_cases()
 
     return {

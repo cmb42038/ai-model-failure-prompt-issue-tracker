@@ -1,3 +1,5 @@
+"""Helpers for repro-case drafting with a fallback and an optional LLM path."""
+
 import json
 import os
 from dataclasses import dataclass
@@ -32,6 +34,7 @@ def is_llm_enabled() -> bool:
 
 
 def get_repro_llm_config() -> ReproLLMConfig | None:
+    """Load optional repro-drafting LLM settings from environment variables."""
     if not is_llm_enabled():
         return None
 
@@ -50,6 +53,7 @@ def get_repro_llm_config() -> ReproLLMConfig | None:
 
 
 def build_repro_system_prompt() -> str:
+    """Build the system prompt used by the optional LLM path."""
     return (
         "You draft concise AI bug reproduction cases. "
         "Return JSON only with these fields: "
@@ -60,6 +64,7 @@ def build_repro_system_prompt() -> str:
 
 
 def build_repro_user_prompt(incident: NormalizedIncident) -> str:
+    """Build the user prompt from a normalized incident."""
     return f"""
 Draft a reproduction case for this normalized AI incident.
 
@@ -87,6 +92,7 @@ def strip_code_fences(value: str) -> str:
 
 
 def parse_repro_case_response(response_text: str) -> ReproCaseDraft:
+    """Parse JSON returned by an LLM into the repro draft schema."""
     cleaned_text = strip_code_fences(response_text)
     payload = json.loads(cleaned_text)
     return ReproCaseDraft(**payload)
@@ -129,6 +135,7 @@ def call_openai_compatible_api(
 
 
 def build_fallback_repro_case_draft(incident: NormalizedIncident) -> ReproCaseDraft:
+    """Create a deterministic local repro draft when no LLM is in use."""
     readable_failure_type = incident.issue_type.replace("-", " ")
 
     return ReproCaseDraft(
@@ -160,6 +167,7 @@ def generate_repro_case_draft_from_incident(
     incident: NormalizedIncident,
     api_caller: Callable[[str, str, ReproLLMConfig], str] = call_openai_compatible_api,
 ) -> ReproCaseDraft:
+    """Generate a repro draft from a normalized incident."""
     config = get_repro_llm_config()
 
     if config is None:
@@ -179,5 +187,6 @@ def generate_repro_case_draft_from_bug_report(
     bug_report: BugReport,
     api_caller: Callable[[str, str, ReproLLMConfig], str] = call_openai_compatible_api,
 ) -> ReproCaseDraft:
+    """Generate a repro draft from a raw bug report."""
     incident = normalize_bug_report(bug_report)
     return generate_repro_case_draft_from_incident(incident, api_caller=api_caller)

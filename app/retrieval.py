@@ -1,3 +1,5 @@
+"""Baseline TF-IDF retrieval helpers for similar-incident search."""
+
 import json
 import math
 import re
@@ -15,6 +17,7 @@ SAMPLE_INCIDENTS_PATH = Path(__file__).resolve().parent / "data" / "sample_incid
 
 
 def load_sample_incidents() -> list[NormalizedIncident]:
+    """Load the small sample incident corpus used by retrieval and demos."""
     with SAMPLE_INCIDENTS_PATH.open(encoding="utf-8") as file:
         raw_incidents = json.load(file)
 
@@ -22,6 +25,7 @@ def load_sample_incidents() -> list[NormalizedIncident]:
 
 
 def build_search_corpus(stored_bug_reports: list[BugReport]) -> list[NormalizedIncident]:
+    """Combine sample incidents with the current in-memory raw reports."""
     incidents = load_sample_incidents()
     incidents.extend(normalize_bug_report(report) for report in stored_bug_reports)
     return incidents
@@ -100,6 +104,7 @@ def find_similar_incidents(
     incidents: list[NormalizedIncident],
     top_k: int = 3,
 ) -> list[SimilarIncidentMatch]:
+    """Return the top TF-IDF matches for a normalized incident."""
     if not incidents:
         return []
 

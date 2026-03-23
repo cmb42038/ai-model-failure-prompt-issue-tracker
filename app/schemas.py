@@ -1,3 +1,5 @@
+"""Pydantic models shared across API routes and service modules."""
+
 from pydantic import BaseModel, Field
 
 
