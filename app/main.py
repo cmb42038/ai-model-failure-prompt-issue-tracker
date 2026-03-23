@@ -2,7 +2,8 @@ from typing import Any
 
 from fastapi import FastAPI
 
-from app.schemas import BugReport
+from app.normalization import normalize_bug_report
+from app.schemas import BugReport, NormalizedIncident
 
 app = FastAPI(title="AI Model Failure / Prompt Issue Tracker")
 bug_reports: list[BugReport] = []
@@ -30,3 +31,8 @@ def create_bug_report(bug_report: BugReport) -> dict[str, Any]:
         "bug_report": bug_report.model_dump(),
         "total_reports": len(bug_reports),
     }
+
+
+@app.post("/bug-reports/normalize", response_model=NormalizedIncident)
+def normalize_bug_report_endpoint(bug_report: BugReport) -> NormalizedIncident:
+    return normalize_bug_report(bug_report)

@@ -10,10 +10,12 @@ The project currently includes a small FastAPI application, a Pydantic bug repor
 app/
   __init__.py
   main.py
+  normalization.py
   schemas.py
 tests/
   test_bug_reports.py
   test_main.py
+  test_normalization.py
 requirements.txt
 README.md
 ```
@@ -70,6 +72,19 @@ Example JSON body:
 
 For now, bug reports are stored only in memory. That means they are cleared whenever the app restarts.
 
+## Normalize A Bug Report
+
+Send the same bug report JSON to `POST /bug-reports/normalize` to get a cleaner incident format back.
+
+The normalization logic is intentionally simple for now. It uses straightforward rules such as:
+
+- trimming extra whitespace
+- lowercasing and cleaning tags
+- assigning a basic issue type from keywords
+- building a short summary
+
+This keeps the code easy to understand before adding any real LLM-based processing later.
+
 ## Run Tests
 
 ```powershell
@@ -83,6 +98,8 @@ Right now the project includes:
 - a minimal FastAPI app
 - a Pydantic bug report schema
 - a POST endpoint for bug reports
+- a normalized incident layer
+- a simple normalization service
 - basic pytest tests
 - a simple project structure
 - setup instructions for local development
