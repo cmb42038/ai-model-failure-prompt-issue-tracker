@@ -43,3 +43,18 @@ class IncidentClustersResponse(BaseModel):
     total_incidents: int
     total_clusters: int
     clusters: list[IncidentCluster] = Field(default_factory=list)
+
+
+class PassFailTestCaseDraft(BaseModel):
+    title: str
+    pass_condition: str
+    fail_condition: str
+
+
+class ReproCaseDraft(BaseModel):
+    summary: str
+    likely_failure_type: str
+    reproduction_steps: list[str] = Field(default_factory=list)
+    expected_behavior: str
+    actual_behavior: str
+    test_case_draft: PassFailTestCaseDraft

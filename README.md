@@ -12,6 +12,7 @@ app/
   __init__.py
   main.py
   normalization.py
+  repro.py
   retrieval.py
   schemas.py
   data/
@@ -21,7 +22,9 @@ tests/
   test_clustering.py
   test_main.py
   test_normalization.py
+  test_repro.py
   test_retrieval.py
+.env.example
 requirements.txt
 README.md
 ```
@@ -45,6 +48,14 @@ python -m venv .venv
 ```powershell
 pip install -r requirements.txt
 ```
+
+4. Optional: enable LLM-based repro drafting:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Then update the values in `.env` if you want to turn on real API calls.
 
 ## Run The App
 
@@ -115,6 +126,50 @@ This is a baseline implementation. It:
 
 It is intentionally simple and designed to be replaced later by better clustering methods or embeddings.
 
+## Draft A Repro Case
+
+You can generate a repro-case draft from either:
+
+- `POST /bug-reports/repro-draft`
+- `POST /incidents/repro-draft`
+
+Each draft includes:
+
+- a short summary
+- the likely failure type
+- reproduction steps
+- expected behavior
+- actual behavior
+- a simple pass/fail test case draft
+
+The repro service is split into three small parts:
+
+- prompt construction
+- API calling
+- response parsing
+
+If LLM use is disabled or not configured, the app falls back to a local rule-based draft so the feature still works without network access.
+
+### Optional LLM Configuration
+
+This milestone includes an optional OpenAI-compatible chat completion integration for repro drafting.
+
+Environment variables:
+
+- `REPRO_USE_LLM`
+- `REPRO_LLM_API_KEY`
+- `REPRO_LLM_MODEL`
+- `REPRO_LLM_BASE_URL`
+- `REPRO_LLM_TIMEOUT_SECONDS`
+
+If `REPRO_USE_LLM` is not set to `true`, the app uses the local fallback draft builder instead.
+
+### Testing Note
+
+The automated tests cover the local fallback logic, prompt building, response parsing, configuration loading, and endpoint behavior without network calls.
+
+The live API path was not exercised in automated tests for this milestone.
+
 ## Run Tests
 
 ```powershell
@@ -132,6 +187,7 @@ Right now the project includes:
 - a simple normalization service
 - a baseline similar-incident retrieval layer
 - a baseline failure-pattern clustering layer
+- an optional LLM-powered repro-case drafting layer
 - basic pytest tests
 - a simple project structure
 - setup instructions for local development
