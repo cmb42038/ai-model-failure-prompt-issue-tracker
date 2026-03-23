@@ -9,6 +9,7 @@ The project currently includes a small FastAPI application, a Pydantic bug repor
 ```text
 app/
   clustering.py
+  evaluation.py
   __init__.py
   main.py
   normalization.py
@@ -16,10 +17,12 @@ app/
   retrieval.py
   schemas.py
   data/
+    evaluation_cases.json
     sample_incidents.json
 tests/
   test_bug_reports.py
   test_clustering.py
+  test_evaluation.py
   test_main.py
   test_normalization.py
   test_repro.py
@@ -170,6 +173,29 @@ The automated tests cover the local fallback logic, prompt building, response pa
 
 The live API path was not exercised in automated tests for this milestone.
 
+## Run The Evaluation
+
+Run the small benchmark with:
+
+```powershell
+python -m app.evaluation
+```
+
+The evaluation uses the labeled sample dataset in `app/data/evaluation_cases.json` and reports simple baseline checks for:
+
+- normalization structure and expected labels
+- top-1 similar-incident retrieval
+- clustering pairwise group agreement
+- repro-case draft completeness
+
+### Evaluation Limitations
+
+- the benchmark is intentionally small and hand-written
+- the metrics are simple counts and rule-based checks
+- clustering is checked with pairwise agreement, not advanced clustering scores
+- repro drafting checks required sections and shape, not writing quality
+- the live LLM API path is not scored by this baseline benchmark
+
 ## Run Tests
 
 ```powershell
@@ -188,6 +214,7 @@ Right now the project includes:
 - a baseline similar-incident retrieval layer
 - a baseline failure-pattern clustering layer
 - an optional LLM-powered repro-case drafting layer
+- a small baseline evaluation framework and benchmark dataset
 - basic pytest tests
 - a simple project structure
 - setup instructions for local development

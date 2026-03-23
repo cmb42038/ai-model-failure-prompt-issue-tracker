@@ -1,0 +1,77 @@
+[
+  {
+    "case_id": "formatting_plain_text",
+    "bug_report": {
+      "title": "  JSON response returned as plain text  ",
+      "model_name": " gpt-4.1-mini ",
+      "prompt": " Return valid JSON with a summary field. ",
+      "expected_behavior": " Return valid JSON only. ",
+      "actual_behavior": " Returned plain text paragraphs instead of JSON. ",
+      "tags": [" Formatting ", "JSON"]
+    },
+    "expected_normalized_title": "JSON response returned as plain text",
+    "expected_issue_type": "formatting",
+    "expected_top_match_title": "JSON response returned as plain text",
+    "expected_cluster_group": "formatting"
+  },
+  {
+    "case_id": "formatting_bullet_points",
+    "bug_report": {
+      "title": " JSON summary request returned bullet points ",
+      "model_name": "gpt-4.1",
+      "prompt": "Return a JSON object with a summary field only.",
+      "expected_behavior": "Return valid JSON with one summary field.",
+      "actual_behavior": "Returned bullet points instead of JSON output.",
+      "tags": [" formatting", "json "]
+    },
+    "expected_normalized_title": "JSON summary request returned bullet points",
+    "expected_issue_type": "formatting",
+    "expected_top_match_title": "JSON summary request returned bullet points",
+    "expected_cluster_group": "formatting"
+  },
+  {
+    "case_id": "instruction_summary",
+    "bug_report": {
+      "title": " System instruction was ignored during summarization ",
+      "model_name": "gpt-4.1",
+      "prompt": "Summarize the ticket in one sentence.",
+      "expected_behavior": "Return one sentence and follow the system instruction.",
+      "actual_behavior": "Returned multiple bullet points and ignored the system instruction.",
+      "tags": ["instruction following", "summarization"]
+    },
+    "expected_normalized_title": "System instruction was ignored during summarization",
+    "expected_issue_type": "instruction-following",
+    "expected_top_match_title": "System instruction was ignored during summarization",
+    "expected_cluster_group": "instruction-following"
+  },
+  {
+    "case_id": "instruction_style",
+    "bug_report": {
+      "title": " Style instruction was ignored in final answer ",
+      "model_name": " gpt-4.1-mini ",
+      "prompt": "Answer in one short sentence and keep the tone neutral.",
+      "expected_behavior": "Follow the style instruction and return one short sentence.",
+      "actual_behavior": "Returned a long answer and ignored the style instruction.",
+      "tags": [" Instruction Following ", "style"]
+    },
+    "expected_normalized_title": "Style instruction was ignored in final answer",
+    "expected_issue_type": "instruction-following",
+    "expected_top_match_title": "Style instruction was ignored in final answer",
+    "expected_cluster_group": "instruction-following"
+  },
+  {
+    "case_id": "hallucination_catalog",
+    "bug_report": {
+      "title": " Product details were hallucinated in the answer ",
+      "model_name": "gpt-4.1-mini",
+      "prompt": "Answer only from the provided product catalog.",
+      "expected_behavior": "Use only the supplied product details.",
+      "actual_behavior": "Invented features that were not in the catalog.",
+      "tags": [" Hallucination ", "factuality"]
+    },
+    "expected_normalized_title": "Product details were hallucinated in the answer",
+    "expected_issue_type": "hallucination",
+    "expected_top_match_title": "Product details were hallucinated in the answer",
+    "expected_cluster_group": "hallucination"
+  }
+]
